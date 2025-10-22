@@ -1,15 +1,19 @@
 import { Category } from "@/domain/enterprise/entities/category"
 import { CategoriesRepository } from "../repositories/categories-repository"
 import { slugify } from "@/core/utils/slugify"
+import { Injectable } from "@nestjs/common"
+import { Either, right } from "@/core/either"
 
 interface CreateCategoryUseCaseRequest {
   name: string
 }
 
-interface CreateCategoryUseCaseResponse {
-  category: Category
-}
+type CreateCategoryUseCaseResponse = Either<
+  never,
+  { category: Category }
+>
 
+@Injectable()
 export class CreateCategoryUseCase {
     constructor(private categoryRepository: CategoriesRepository) {}
 
@@ -20,7 +24,7 @@ export class CreateCategoryUseCase {
 
     await this.categoryRepository.create(category)
 
-    return { category }
+    return right({ category })
   }
 }
 

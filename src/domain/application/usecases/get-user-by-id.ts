@@ -1,15 +1,18 @@
 import { User } from "@/domain/enterprise/entities/user"
 import { UsersRepository } from "../repositories/users-repository"
-import { ResourceNotFoundError } from "@/core/errors/resource-not-found-error"
+import { Injectable } from "@nestjs/common"
+import { Either, left, right } from "@/core/either"
 
 interface GetUserByIdUseCaseRequest {
   id: string
 }
 
-interface GetUserByIdUseCaseResponse {
-  user: User
-}
+type GetUserByIdUseCaseResponse = Either<
+  { message: string },
+  { user: User }
+>
 
+@Injectable()
 export class GetUserByIdUseCase {
   constructor(private userRepository: UsersRepository) {}
 
@@ -19,10 +22,10 @@ export class GetUserByIdUseCase {
     const user = await this.userRepository.findById(id)
 
     if (!user) {
-      throw new ResourceNotFoundError()
+      return left({ message: 'Resource not found' })
     }
 
-    return { user }
+    return right({ user })
   }
 }
 

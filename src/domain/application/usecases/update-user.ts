@@ -1,6 +1,7 @@
 import { User } from "@/domain/enterprise/entities/user"
 import { UsersRepository } from "../repositories/users-repository"
-import { ResourceNotFoundError } from "@/core/errors/resource-not-found-error"
+import { Injectable } from "@nestjs/common"
+import { Either, left, right } from "@/core/either"
 import * as bcrypt from 'bcryptjs'
 
 interface UpdateUserUseCaseRequest {
@@ -12,10 +13,12 @@ interface UpdateUserUseCaseRequest {
   avatar?: string
 }
 
-interface UpdateUserUseCaseResponse {
-  user: User
-}
+type UpdateUserUseCaseResponse = Either<
+  { message: string },
+  { user: User }
+>
 
+@Injectable()
 export class UpdateUserUseCase {
   constructor(private userRepository: UsersRepository) {}
 
@@ -25,7 +28,7 @@ export class UpdateUserUseCase {
     const user = await this.userRepository.findById(id)
 
     if (!user) {
-      throw new ResourceNotFoundError()
+      return left({ message: 'Resource not found' })
     }
 
     if (name) {
@@ -35,7 +38,7 @@ export class UpdateUserUseCase {
     if (email) {
       const userWithSameEmail = await this.userRepository.findByEmail(email)
       if (userWithSameEmail && userWithSameEmail.id.toString() !== id) {
-        throw new Error('Email already in use')
+        return left({ message: 'Email already in use' })
       }
       user.email = email
     }
@@ -55,7 +58,7 @@ export class UpdateUserUseCase {
 
     await this.userRepository.update(user)
 
-    return { user }
+    return right({ user })
   }
 }
 

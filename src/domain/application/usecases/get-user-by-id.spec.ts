@@ -15,22 +15,32 @@ describe('Get User By ID', () => {
   })
 
   it('should be able to get a user by id', async () => {
-    const { user: createdUser } = await createUser.execute({
+    const createResult = await createUser.execute({
       name: 'John Doe',
       email: 'john@example.com',
       password: '123456'
     })
 
-    const result = await sut.execute({ id: createdUser.id.toString() })
+    expect(createResult.isRight()).toBe(true)
+    if (createResult.isRight()) {
+      const createdUser = createResult.value.user
+      const result = await sut.execute({ id: createdUser.id.toString() })
 
-    expect(result.user).toEqual(createdUser)
-    expect(result.user.name).toBe('John Doe')
+      expect(result.isRight()).toBe(true)
+      if (result.isRight()) {
+        expect(result.value.user).toEqual(createdUser)
+        expect(result.value.user.name).toBe('John Doe')
+      }
+    }
   })
 
   it('should throw ResourceNotFoundError when user does not exist', async () => {
-    await expect(() => 
-      sut.execute({ id: 'non-existent-id' })
-    ).rejects.toThrow(ResourceNotFoundError)
+    const result = await sut.execute({ id: 'non-existent-id' })
+
+    expect(result.isLeft()).toBe(true)
+    if (result.isLeft()) {
+      expect(result.value.message).toBe('Resource not found')
+    }
   })
 })
 

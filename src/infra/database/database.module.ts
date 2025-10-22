@@ -3,28 +3,31 @@ import { PrismaService } from "./prisma.service";
 import { PrismaUsersRepository } from './repositories/prisma-users-repository'
 import { PrismaCategoriesRepository } from './repositories/prisma-categories-repository'
 import { PrismaPostsRepository } from './repositories/prisma-posts-repository'
+import { UsersRepository } from "@/domain/application/repositories/users-repository";
+import { CategoriesRepository } from "@/domain/application/repositories/categories-repository";
+import { PostsRepository } from "@/domain/application/repositories/posts-repository";
 
 @Module({
   providers: [
     PrismaService,
     {
-      provide: 'UsersRepository',
+      provide: UsersRepository,
       useClass: PrismaUsersRepository,
     },
     {
-      provide: 'CategoriesRepository',
+      provide: CategoriesRepository,
       useClass: PrismaCategoriesRepository,
     },
     {
-      provide: 'PostsRepository',
+      provide: PostsRepository,
       useClass: PrismaPostsRepository,
     },
   ],
   exports: [
     PrismaService,
-    'UsersRepository',
-    'CategoriesRepository',
-    'PostsRepository',
+    UsersRepository,
+    CategoriesRepository,
+    PostsRepository,
   ],
 })
 export class DatabaseModule {}

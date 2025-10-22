@@ -1,8 +1,11 @@
-import { PrismaService } from "@/infra/database/prisma.service";
-import { Body, ConflictException, Controller, HttpCode, Post, UsePipes } from "@nestjs/common";
+import { CreateUserUseCase } from "@/domain/application/usecases/create-user";
+import { Body, ConflictException, Controller, HttpCode, Post } from "@nestjs/common";
+import { ApiTags, ApiOperation, ApiResponse, ApiBody } from "@nestjs/swagger";
 import { z } from "zod";
-import { hash } from "bcryptjs"
 import { ZodValidationPipe } from "../pipes/zod-validation-pipe";
+import { HttpUserPresenter } from "./presenter/http-user-presenter";
+import { CreateAccountDto } from "../dtos/create-account.dto";
+import { UserResponseWrapperDto } from "../dtos/user-response.dto";
 
 const createAccountBodySchema = z.object({
   name: z.string(),
@@ -12,34 +15,40 @@ const createAccountBodySchema = z.object({
 
 type CreateAccountBodySchema = z.infer<typeof createAccountBodySchema>
 
+@ApiTags('users')
 @Controller('/accounts')
 export class CreateAccountController {
-  constructor(private prisma: PrismaService){}
+  constructor(private createUserUseCase: CreateUserUseCase){}
 
   @Post()
   @HttpCode(201)
-  @UsePipes(new ZodValidationPipe(createAccountBodySchema))
-  async handle(@Body() body: CreateAccountBodySchema) {
+  @ApiOperation({ 
+    summary: 'Criar uma nova conta de usuário',
+    description: 'Cria uma nova conta de usuário no sistema'
+  })
+  @ApiBody({ type: CreateAccountDto })
+  @ApiResponse({ 
+    status: 201, 
+    description: 'Usuário criado com sucesso',
+    type: UserResponseWrapperDto
+  })
+  @ApiResponse({ 
+    status: 409, 
+    description: 'Email já está em uso' 
+  })
+  @ApiResponse({ 
+    status: 400, 
+    description: 'Dados de validação inválidos' 
+  })
+  async handle(@Body(new ZodValidationPipe(createAccountBodySchema)) body: CreateAccountBodySchema) {
     const { name, email, password } = body
 
-    const userWithSameEmail = await this.prisma.user.findUnique({
-      where: {
-        email
-      }
-    })
+    const result = await this.createUserUseCase.execute({ name, email, password })
 
-    if (userWithSameEmail) {
-      throw new ConflictException('User with same e-mail address already exists')
+    if (result.isLeft()) {
+      throw new ConflictException(result.value.message)
     }
 
-    const hashedPassword = await hash(password, 8)
-
-    await this.prisma.user.create({
-      data: {
-        name,
-        email,
-        password: hashedPassword
-      }
-    })
+    return { user: HttpUserPresenter.toHttp(result.value.user) }
   }
 }

@@ -22,14 +22,20 @@ describe('Get Category By ID', () => {
 
     const result = await sut.execute({ id: category.id.toString() })
 
-    expect(result.category).toEqual(category)
-    expect(result.category.name).toBe('Technology')
+    expect(result.isRight()).toBe(true)
+    if (result.isRight()) {
+      expect(result.value.category).toEqual(category)
+      expect(result.value.category.name).toBe('Technology')
+    }
   })
 
   it('should throw ResourceNotFoundError when category does not exist', async () => {
-    await expect(() => 
-      sut.execute({ id: 'non-existent-id' })
-    ).rejects.toThrow(ResourceNotFoundError)
+    const result = await sut.execute({ id: 'non-existent-id' })
+
+    expect(result.isLeft()).toBe(true)
+    if (result.isLeft()) {
+      expect(result.value.message).toBe('Resource not found')
+    }
   })
 })
 

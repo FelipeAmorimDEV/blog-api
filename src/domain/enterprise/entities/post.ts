@@ -50,6 +50,10 @@ export class Post extends Entity<PostProps> {
         return this.props.categoryId
     }
 
+    get imagem() {
+        return this.props.imagem
+    }
+
     set title(title: string) {
         this.props.title = title
         this.props.updatedAt = new Date()
@@ -75,6 +79,16 @@ export class Post extends Entity<PostProps> {
         this.props.updatedAt = new Date()
     }
 
+    set imagem(imagem: string) {
+        this.props.imagem = imagem
+        this.props.updatedAt = new Date()
+    }
+
+    set publishedAt(publishedAt: Date | undefined) {
+        this.props.publishedAt = publishedAt
+        this.props.updatedAt = new Date()
+    }
+
   static create(props: Optional<PostProps, 'createdAt'>, id?: UniqueEntityID) {
     const post = new Post({
         ...props,
@@ -91,6 +105,7 @@ type PostProps = {
   title: string
   content: string
   excerpt: string
+  imagem: string
   createdAt: Date
   updatedAt?: Date
   publishedAt?: Date

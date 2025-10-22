@@ -1,15 +1,18 @@
 import { Post } from "@/domain/enterprise/entities/post"
 import { PostsRepository } from "../repositories/posts-repository"
-import { ResourceNotFoundError } from "@/core/errors/resource-not-found-error"
+import { Injectable } from "@nestjs/common"
+import { Either, left, right } from "@/core/either"
 
 interface GetPostByIdUseCaseRequest {
   id: string
 }
 
-interface GetPostByIdUseCaseResponse {
-  post: Post
-}
+type GetPostByIdUseCaseResponse = Either<
+  { message: string },
+  { post: Post }
+>
 
+@Injectable()
 export class GetPostByIdUseCase {
   constructor(private postRepository: PostsRepository) {}
 
@@ -19,10 +22,10 @@ export class GetPostByIdUseCase {
     const post = await this.postRepository.findById(id)
 
     if (!post) {
-      throw new ResourceNotFoundError()
+      return left({ message: 'Resource not found' })
     }
 
-    return { post }
+    return right({ post })
   }
 }
 

@@ -1,6 +1,7 @@
 import { Category } from "@/domain/enterprise/entities/category"
 import { CategoriesRepository } from "../repositories/categories-repository"
-import { ResourceNotFoundError } from "@/core/errors/resource-not-found-error"
+import { Injectable } from "@nestjs/common"
+import { Either, left, right } from "@/core/either"
 import { slugify } from "@/core/utils/slugify"
 
 interface UpdateCategoryUseCaseRequest {
@@ -8,10 +9,12 @@ interface UpdateCategoryUseCaseRequest {
   name?: string
 }
 
-interface UpdateCategoryUseCaseResponse {
-  category: Category
-}
+type UpdateCategoryUseCaseResponse = Either<
+  { message: string },
+  { category: Category }
+>
 
+@Injectable()
 export class UpdateCategoryUseCase {
   constructor(private categoryRepository: CategoriesRepository) {}
 
@@ -21,7 +24,7 @@ export class UpdateCategoryUseCase {
     const category = await this.categoryRepository.findById(id)
 
     if (!category) {
-      throw new ResourceNotFoundError()
+      return left({ message: 'Resource not found' })
     }
 
     if (name) {
@@ -31,7 +34,7 @@ export class UpdateCategoryUseCase {
 
     await this.categoryRepository.update(category)
 
-    return { category }
+    return right({ category })
   }
 }
 

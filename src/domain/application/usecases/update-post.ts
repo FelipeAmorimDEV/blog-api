@@ -1,8 +1,9 @@
 import { Post } from "@/domain/enterprise/entities/post"
 import { PostsRepository } from "../repositories/posts-repository"
-import { ResourceNotFoundError } from "@/core/errors/resource-not-found-error"
 import { UniqueEntityID } from "@/core/entities/unique-entity-id"
 import { slugify } from "@/core/utils/slugify"
+import { Injectable } from "@nestjs/common"
+import { Either, left, right } from "@/core/either"
 
 interface UpdatePostUseCaseRequest {
   id: string
@@ -10,22 +11,25 @@ interface UpdatePostUseCaseRequest {
   content?: string
   excerpt?: string
   categoryId?: string
+  publishedAt?: string | null
 }
 
-interface UpdatePostUseCaseResponse {
-  post: Post
-}
+type UpdatePostUseCaseResponse = Either<
+  { message: string },
+  { post: Post }
+>
 
+@Injectable()
 export class UpdatePostUseCase {
   constructor(private postRepository: PostsRepository) {}
 
   async execute(request: UpdatePostUseCaseRequest): Promise<UpdatePostUseCaseResponse> {
-    const { id, title, content, excerpt, categoryId } = request
+    const { id, title, content, excerpt, categoryId, publishedAt } = request
 
     const post = await this.postRepository.findById(id)
 
     if (!post) {
-      throw new ResourceNotFoundError()
+      return left({ message: 'Resource not found' })
     }
 
     if (title) {
@@ -44,9 +48,17 @@ export class UpdatePostUseCase {
     if (categoryId) {
       post.categoryId = new UniqueEntityID(categoryId)
     }
+    
+    if (publishedAt !== undefined) {
+      if (publishedAt === null || publishedAt === 'null') {
+        post.publishedAt = undefined
+      } else {
+        post.publishedAt = new Date(publishedAt)
+      }
+    }
 
     await this.postRepository.update(post)
 
-    return { post }
+    return right({ post })
   }
 }

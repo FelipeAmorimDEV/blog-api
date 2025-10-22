@@ -27,9 +27,12 @@ describe('Delete Category', () => {
   })
 
   it('should throw ResourceNotFoundError when category does not exist', async () => {
-    await expect(() => 
-      sut.execute({ id: 'non-existent-id' })
-    ).rejects.toThrow(ResourceNotFoundError)
+    const result = await sut.execute({ id: 'non-existent-id' })
+
+    expect(result.isLeft()).toBe(true)
+    if (result.isLeft()) {
+      expect(result.value.message).toBe('Resource not found')
+    }
   })
 })
 

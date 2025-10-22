@@ -15,22 +15,29 @@ describe('Delete User', () => {
   })
 
   it('should be able to delete a user', async () => {
-    const { user } = await createUser.execute({
+    const createResult = await createUser.execute({
       name: 'John Doe',
       email: 'john@example.com',
       password: '123456'
     })
 
-    await sut.execute({ id: user.id.toString() })
+    expect(createResult.isRight()).toBe(true)
+    if (createResult.isRight()) {
+      const user = createResult.value.user
+      await sut.execute({ id: user.id.toString() })
 
-    const deletedUser = await inMemoryUsersRepository.findById(user.id.toString())
-    expect(deletedUser).toBeNull()
+      const deletedUser = await inMemoryUsersRepository.findById(user.id.toString())
+      expect(deletedUser).toBeNull()
+    }
   })
 
   it('should throw ResourceNotFoundError when user does not exist', async () => {
-    await expect(() => 
-      sut.execute({ id: 'non-existent-id' })
-    ).rejects.toThrow(ResourceNotFoundError)
+    const result = await sut.execute({ id: 'non-existent-id' })
+
+    expect(result.isLeft()).toBe(true)
+    if (result.isLeft()) {
+      expect(result.value.message).toBe('Resource not found')
+    }
   })
 })
 

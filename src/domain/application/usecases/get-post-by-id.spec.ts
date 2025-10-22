@@ -27,14 +27,20 @@ describe('Get Post By ID', () => {
 
     const result = await sut.execute({ id: post.id.toString() })
 
-    expect(result.post).toEqual(post)
-    expect(result.post.title).toBe('Post 1')
+    expect(result.isRight()).toBe(true)
+    if (result.isRight()) {
+      expect(result.value.post).toEqual(post)
+      expect(result.value.post.title).toBe('Post 1')
+    }
   })
 
   it('should throw ResourceNotFoundError when post does not exist', async () => {
-    await expect(() => 
-      sut.execute({ id: 'non-existent-id' })
-    ).rejects.toThrow(ResourceNotFoundError)
+    const result = await sut.execute({ id: 'non-existent-id' })
+
+    expect(result.isLeft()).toBe(true)
+    if (result.isLeft()) {
+      expect(result.value.message).toBe('Resource not found')
+    }
   })
 })
 

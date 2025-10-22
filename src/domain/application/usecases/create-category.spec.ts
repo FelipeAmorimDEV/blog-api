@@ -15,8 +15,11 @@ describe('Create Category', () => {
       name: 'Technology'
     })
 
-    expect(result.category.id).toBeDefined()
-    expect(result.category.name).toBe('Technology')
-    expect(result.category.slug).toBe('technology')
+    expect(result.isRight()).toBe(true)
+    if (result.isRight()) {
+      expect(result.value.category.id).toBeDefined()
+      expect(result.value.category.name).toBe('Technology')
+      expect(result.value.category.slug).toBe('technology')
+    }
   })
 })

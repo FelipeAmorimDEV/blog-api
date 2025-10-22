@@ -14,14 +14,16 @@ describe('Create Post', () => {
     const result = await sut.execute({
       title: 'Post 1',
       content: 'Content 1',
-      excerpt: 'Excerpt 1',
       authorId: '1',
       categoryId: '1',
     })
 
-    expect(result.post.id).toBeDefined()
-    expect(result.post.title).toBe('Post 1')
-    expect(result.post.content).toBe('Content 1')
-    expect(result.post.excerpt).toBe('Excerpt 1')
+    expect(result.isRight()).toBe(true)
+    if (result.isRight()) {
+      expect(result.value.post.id).toBeDefined()
+      expect(result.value.post.title).toBe('Post 1')
+      expect(result.value.post.content).toBe('Content 1')
+      expect(result.value.post.excerpt).toBe('Content 1')
+    }
   })
 })

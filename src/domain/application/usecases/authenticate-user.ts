@@ -1,21 +1,20 @@
 import { UsersRepository } from "../repositories/users-repository";
+import { User } from "@/domain/enterprise/entities/user";
 import * as bcrypt from 'bcryptjs';
+import { Injectable } from "@nestjs/common";
+import { Either, left, right } from "@/core/either";
 
 interface AuthenticateUserUseCaseRequest {
   email: string
   password: string
 }
 
-interface AuthenticateUserUseCaseResponse {
-  user: {
-    id: string
-    name: string
-    email: string
-    role: string
-    avatar?: string
-  }
-}
+type AuthenticateUserUseCaseResponse = Either<
+  { message: string },
+  { user: User }
+>
 
+@Injectable()
 export class AuthenticateUserUseCase {
   constructor(private userRepository: UsersRepository) {}
 
@@ -25,24 +24,16 @@ export class AuthenticateUserUseCase {
     const user = await this.userRepository.findByEmail(email)
 
     if (!user) {
-      throw new Error('Invalid credentials')
+      return left({ message: 'Invalid credentials' })
     }
 
     const isPasswordValid = await bcrypt.compare(password, user.password)
 
     if (!isPasswordValid) {
-      throw new Error('Invalid credentials')
+      return left({ message: 'Invalid credentials' })
     }
 
-    return {
-      user: {
-        id: user.id.toString(),
-        name: user.name,
-        email: user.email,
-        role: user.role,
-        avatar: user.avatar
-      }
-    }
+    return right({ user })
   }
 }
 

@@ -26,13 +26,16 @@ describe('Authenticate User', () => {
       password: '123456'
     })
 
-    expect(result.user).toEqual(
-      expect.objectContaining({
-        name: 'John Doe',
-        email: 'john@example.com',
-        role: 'user'
-      })
-    )
+    expect(result.isRight()).toBe(true)
+    if (result.isRight()) {
+      expect(result.value.user).toEqual(
+        expect.objectContaining({
+          name: 'John Doe',
+          email: 'john@example.com',
+          role: 'user'
+        })
+      )
+    }
   })
 
   it('should not be able to authenticate with wrong email', async () => {
@@ -42,12 +45,15 @@ describe('Authenticate User', () => {
       password: '123456'
     })
 
-    await expect(() => 
-      sut.execute({
-        email: 'wrong@example.com',
-        password: '123456'
-      })
-    ).rejects.toThrow('Invalid credentials')
+    const result = await sut.execute({
+      email: 'wrong@example.com',
+      password: '123456'
+    })
+
+    expect(result.isLeft()).toBe(true)
+    if (result.isLeft()) {
+      expect(result.value.message).toBe('Invalid credentials')
+    }
   })
 
   it('should not be able to authenticate with wrong password', async () => {
@@ -57,12 +63,15 @@ describe('Authenticate User', () => {
       password: '123456'
     })
 
-    await expect(() => 
-      sut.execute({
-        email: 'john@example.com',
-        password: 'wrong-password'
-      })
-    ).rejects.toThrow('Invalid credentials')
+    const result = await sut.execute({
+      email: 'john@example.com',
+      password: 'wrong-password'
+    })
+
+    expect(result.isLeft()).toBe(true)
+    if (result.isLeft()) {
+      expect(result.value.message).toBe('Invalid credentials')
+    }
   })
 })
 

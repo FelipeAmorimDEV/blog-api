@@ -27,15 +27,21 @@ describe('Get All Categories', () => {
 
     const result = await sut.execute()
 
-    expect(result.categories).toHaveLength(2)
-    expect(result.categories).toEqual([category1, category2])
+    expect(result.isRight()).toBe(true)
+    if (result.isRight()) {
+      expect(result.value.categories).toHaveLength(2)
+      expect(result.value.categories).toEqual([category1, category2])
+    }
   })
 
   it('should return empty array when no categories exist', async () => {
     const result = await sut.execute()
 
-    expect(result.categories).toHaveLength(0)
-    expect(result.categories).toEqual([])
+    expect(result.isRight()).toBe(true)
+    if (result.isRight()) {
+      expect(result.value.categories).toHaveLength(0)
+      expect(result.value.categories).toEqual([])
+    }
   })
 })
 

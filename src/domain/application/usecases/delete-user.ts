@@ -1,23 +1,32 @@
 import { UsersRepository } from "../repositories/users-repository"
-import { ResourceNotFoundError } from "@/core/errors/resource-not-found-error"
+import { Injectable } from "@nestjs/common"
+import { Either, left, right } from "@/core/either"
 
 interface DeleteUserUseCaseRequest {
   id: string
 }
 
+type DeleteUserUseCaseResponse = Either<
+  { message: string },
+  void
+>
+
+@Injectable()
 export class DeleteUserUseCase {
   constructor(private userRepository: UsersRepository) {}
 
-  async execute(request: DeleteUserUseCaseRequest): Promise<void> {
+  async execute(request: DeleteUserUseCaseRequest): Promise<DeleteUserUseCaseResponse> {
     const { id } = request
 
     const user = await this.userRepository.findById(id)
 
     if (!user) {
-      throw new ResourceNotFoundError()
+      return left({ message: 'Resource not found' })
     }
 
     await this.userRepository.delete(id)
+
+    return right(undefined)
   }
 }
 

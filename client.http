@@ -1,4 +1,9 @@
 @baseUrl = http://localhost:3333
+
+### ===========================================
+### AUTENTICAÇÃO
+### ===========================================
+
 # @name create_account
 POST {{baseUrl}}/accounts
 Content-Type: application/json
@@ -16,6 +21,163 @@ POST {{baseUrl}}/sessions
 Content-Type: application/json
 
 {
-  "email": "felipe4@gmail.com",
+  "email": "felipe@gmail.com",
   "password": "123456"
 }
+
+### ===========================================
+### POSTS
+### ===========================================
+
+# @name create_post
+POST {{baseUrl}}/posts
+Content-Type: application/json
+
+{
+  "title": "Meu Primeiro Post",
+  "content": "Este é o conteúdo do meu primeiro post no blog. Aqui posso escrever sobre qualquer assunto interessante.",
+  "excerpt": "Um resumo breve do post para exibir na listagem",
+  "categoryId": "32da5b7d-b544-4004-bc48-9a78984fb27b"
+}
+
+###
+
+# @name get_all_posts
+GET {{baseUrl}}/posts
+
+###
+
+# @name get_post_by_id
+GET {{baseUrl}}/posts/post-id-aqui
+
+###
+
+# @name get_all_posts_with_relations
+GET {{baseUrl}}/posts-with-relations
+
+
+
+###
+
+# @name get_post_with_relations
+GET {{baseUrl}}/posts/d957fdca-6f97-4ef7-997f-bbdaea68149d/with-relations
+
+###
+
+# @name get_post_by_slug
+GET {{baseUrl}}/posts/slug/como-funciona-o-hook-usestate
+
+###
+
+# @name get_post_by_slug_with_relations
+GET {{baseUrl}}/posts/slug/como-funciona-o-hook-usestate/with-relations
+
+###
+
+# @name toggle_post_publication
+PATCH {{baseUrl}}/posts/d957fdca-6f97-4ef7-997f-bbdaea68149d/publish
+Authorization: Bearer SEU_TOKEN_JWT
+
+###
+
+# @name toggle_post_publication_by_slug
+PATCH {{baseUrl}}/posts/slug/como-funciona-o-hook-usestate/publish
+Authorization: Bearer SEU_TOKEN_JWT
+
+### ===========================================
+### ADMIN ENDPOINTS
+### ===========================================
+
+# @name get_posts_by_status_admin
+GET {{baseUrl}}/admin/posts/by-status
+Authorization: Bearer SEU_TOKEN_JWT
+
+###
+
+# @name get_posts_by_status_with_relations_admin
+GET {{baseUrl}}/admin/posts/by-status/with-relations
+Authorization: Bearer SEU_TOKEN_JWT
+
+###
+
+# @name update_post
+PUT {{baseUrl}}/posts/4ceb9b10-7d5c-4e73-9eb3-e3dc814af8dc
+Content-Type: application/json
+
+{
+  "publishedAt": null
+}
+
+###
+
+# @name delete_post
+DELETE {{baseUrl}}/posts/post-id-aqui
+
+### ===========================================
+### CATEGORIAS
+### ===========================================
+
+# @name create_category
+POST {{baseUrl}}/categories
+Content-Type: application/json
+
+{
+  "name": "UI/UX",
+  "description": "Posts sobre UI/UX"
+}
+
+###
+
+# @name get_all_categories
+GET {{baseUrl}}/categories
+
+###
+
+# @name get_category_by_id
+GET {{baseUrl}}/categories/category-id-aqui
+
+###
+
+# @name update_category
+PUT {{baseUrl}}/categories/category-id-aqui
+Content-Type: application/json
+
+{
+  "name": "Tecnologia Atualizada",
+  "description": "Descrição atualizada da categoria"
+}
+
+###
+
+# @name delete_category
+DELETE {{baseUrl}}/categories/category-id-aqui
+
+### ===========================================
+### USUÁRIOS
+### ===========================================
+
+# @name get_all_users
+GET {{baseUrl}}/users
+
+###
+
+# @name get_user_by_id
+GET {{baseUrl}}/users/user-id-aqui
+
+###
+
+# @name update_user
+PUT {{baseUrl}}/users/8919fa1d-9f03-45e9-8f6f-4622b5f989bd
+Content-Type: application/json
+
+{
+  "name": "Felipe Amorim Atualizado",
+  "email": "felipe.updated@gmail.com",
+  "role": "admin",
+  "avatar": "https://example.com/avatar.jpg"
+}
+
+###
+
+# @name delete_user
+DELETE {{baseUrl}}/users/user-id-aqui

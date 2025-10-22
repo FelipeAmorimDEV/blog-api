@@ -25,18 +25,24 @@ describe('Update Category', () => {
       name: 'Updated Technology'
     })
 
-    expect(result.category.name).toBe('Updated Technology')
-    expect(result.category.slug).toBe('updated-technology')
-    expect(result.category.updatedAt).toBeDefined()
+    expect(result.isRight()).toBe(true)
+    if (result.isRight()) {
+      expect(result.value.category.name).toBe('Updated Technology')
+      expect(result.value.category.slug).toBe('updated-technology')
+      expect(result.value.category.updatedAt).toBeDefined()
+    }
   })
 
   it('should throw ResourceNotFoundError when category does not exist', async () => {
-    await expect(() => 
-      sut.execute({ 
-        id: 'non-existent-id',
-        name: 'Updated Name'
-      })
-    ).rejects.toThrow(ResourceNotFoundError)
+    const result = await sut.execute({ 
+      id: 'non-existent-id',
+      name: 'Updated Name'
+    })
+
+    expect(result.isLeft()).toBe(true)
+    if (result.isLeft()) {
+      expect(result.value.message).toBe('Resource not found')
+    }
   })
 })
 

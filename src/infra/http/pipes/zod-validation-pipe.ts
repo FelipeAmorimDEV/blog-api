@@ -11,9 +11,15 @@ export class ZodValidationPipe implements PipeTransform {
       return parsedValue;
     } catch (error) {
       if (error instanceof ZodError) {
-        throw new BadRequestException({ errors: fromZodError(error), message: 'Validation failed', statusCode: 400});
+        console.log('=== DEBUG INFO ===');
+        console.log('Error:', error);
+        console.log('==================');
+        throw new BadRequestException('Validation failed', { cause: fromZodError(error) });
       }
-      throw new BadRequestException('Validation failed');
+      console.log('=== DEBUG INFO ===');
+      console.log('Error:', error);
+      console.log('==================');
+      throw new BadRequestException('Validation failed', { cause: error });
     }
   }
 }

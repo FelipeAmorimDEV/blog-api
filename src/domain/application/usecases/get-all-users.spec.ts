@@ -28,16 +28,22 @@ describe('Get All Users', () => {
 
     const result = await sut.execute()
 
-    expect(result.users).toHaveLength(2)
-    expect(result.users[0].name).toBe('John Doe')
-    expect(result.users[1].name).toBe('Jane Doe')
+    expect(result.isRight()).toBe(true)
+    if (result.isRight()) {
+      expect(result.value.users).toHaveLength(2)
+      expect(result.value.users[0].name).toBe('John Doe')
+      expect(result.value.users[1].name).toBe('Jane Doe')
+    }
   })
 
   it('should return empty array when no users exist', async () => {
     const result = await sut.execute()
 
-    expect(result.users).toHaveLength(0)
-    expect(result.users).toEqual([])
+    expect(result.isRight()).toBe(true)
+    if (result.isRight()) {
+      expect(result.value.users).toHaveLength(0)
+      expect(result.value.users).toEqual([])
+    }
   })
 })
 

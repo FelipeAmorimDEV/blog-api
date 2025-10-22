@@ -36,15 +36,21 @@ describe('Get All Posts', () => {
 
     const result = await sut.execute()
 
-    expect(result.posts).toHaveLength(2)
-    expect(result.posts).toEqual([post1, post2])
+    expect(result.isRight()).toBe(true)
+    if (result.isRight()) {
+      expect(result.value.posts).toHaveLength(2)
+      expect(result.value.posts).toEqual([post1, post2])
+    }
   })
 
   it('should return empty array when no posts exist', async () => {
     const result = await sut.execute()
 
-    expect(result.posts).toHaveLength(0)
-    expect(result.posts).toEqual([])
+    expect(result.isRight()).toBe(true)
+    if (result.isRight()) {
+      expect(result.value.posts).toHaveLength(0)
+      expect(result.value.posts).toEqual([])
+    }
   })
 })
 

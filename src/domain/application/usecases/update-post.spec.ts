@@ -31,10 +31,13 @@ describe('Update Post', () => {
       content: 'Updated Content'
     })
 
-    expect(result.post.title).toBe('Updated Post')
-    expect(result.post.content).toBe('Updated Content')
-    expect(result.post.slug).toBe('updated-post')
-    expect(result.post.updatedAt).toBeDefined()
+    expect(result.isRight()).toBe(true)
+    if (result.isRight()) {
+      expect(result.value.post.title).toBe('Updated Post')
+      expect(result.value.post.content).toBe('Updated Content')
+      expect(result.value.post.slug).toBe('updated-post')
+      expect(result.value.post.updatedAt).toBeDefined()
+    }
   })
 
   it('should update only provided fields', async () => {
@@ -54,18 +57,24 @@ describe('Update Post', () => {
       title: 'Updated Title Only'
     })
 
-    expect(result.post.title).toBe('Updated Title Only')
-    expect(result.post.content).toBe('Content 1')
-    expect(result.post.excerpt).toBe('Excerpt 1')
-    expect(result.post.slug).toBe('updated-title-only')
+    expect(result.isRight()).toBe(true)
+    if (result.isRight()) {
+      expect(result.value.post.title).toBe('Updated Title Only')
+      expect(result.value.post.content).toBe('Content 1')
+      expect(result.value.post.excerpt).toBe('Excerpt 1')
+      expect(result.value.post.slug).toBe('updated-title-only')
+    }
   })
 
   it('should throw ResourceNotFoundError when post does not exist', async () => {
-    await expect(() => 
-      sut.execute({ 
-        id: 'non-existent-id',
-        title: 'Updated Title'
-      })
-    ).rejects.toThrow(ResourceNotFoundError)
+    const result = await sut.execute({ 
+      id: 'non-existent-id',
+      title: 'Updated Title'
+    })
+
+    expect(result.isLeft()).toBe(true)
+    if (result.isLeft()) {
+      expect(result.value.message).toBe('Resource not found')
+    }
   })
 })

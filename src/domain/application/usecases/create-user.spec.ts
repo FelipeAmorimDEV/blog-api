@@ -18,11 +18,14 @@ describe('Create User', () => {
       password: '123456'
     })
 
-    expect(result.user.id).toBeDefined()
-    expect(result.user.name).toBe('John Doe')
-    expect(result.user.email).toBe('john@example.com')
-    expect(result.user.password).not.toBe('123456') // Should be hashed
-    expect(await bcrypt.compare('123456', result.user.password)).toBe(true)
+    expect(result.isRight()).toBe(true)
+    if (result.isRight()) {
+      expect(result.value.user.id).toBeDefined()
+      expect(result.value.user.name).toBe('John Doe')
+      expect(result.value.user.email).toBe('john@example.com')
+      expect(result.value.user.password).not.toBe('123456') // Should be hashed
+      expect(await bcrypt.compare('123456', result.value.user.password)).toBe(true)
+    }
   })
 
   it('should not be able to create a user with same email', async () => {
@@ -32,13 +35,16 @@ describe('Create User', () => {
       password: '123456'
     })
 
-    await expect(() => 
-      sut.execute({
-        name: 'Jane Doe',
-        email: 'john@example.com',
-        password: '654321'
-      })
-    ).rejects.toThrow('User with same email already exists')
+    const result = await sut.execute({
+      name: 'Jane Doe',
+      email: 'john@example.com',
+      password: '654321'
+    })
+
+    expect(result.isLeft()).toBe(true)
+    if (result.isLeft()) {
+      expect(result.value.message).toBe('User with same email already exists')
+    }
   })
 })
 
