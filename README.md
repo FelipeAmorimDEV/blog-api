@@ -90,7 +90,7 @@ src/
 
 1. **Clone o repositório:**
 ```bash
-git clone <url-do-repositorio>
+git clone [<url-do-repositorio>](https://github.com/FelipeAmorimDEV/blog-api.git)
 cd blog-api
 ```
 
@@ -455,4 +455,5 @@ Felipe Amorim
 ---
 
 ⭐ Se este projeto foi útil para você, considere dar uma estrela!
+
 
